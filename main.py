@@ -4,6 +4,7 @@ import torch
 import io
 import json
 from torchvision import transforms as T
+import gc
 
 app = FastAPI()
 
@@ -92,6 +93,12 @@ async def predict(file: UploadFile = File(...)):
     class_name = idx_to_class[pred_idx]
     prob = torch.softmax(outputs, dim=1)
     confidence = prob[0][pred_idx].item()
+
+    del image
+    del img_tensor
+    del outputs
+    del probs
+    gc.collect()
 
     return {
         "prediction": class_name,
